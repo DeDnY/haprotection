@@ -81,7 +81,3 @@ Flask (app.py) поднимает веб-сервер на порт 8080, пар
 
 Авторы
 @DeDnY
-This project is licensed under the MIT License.
-
-Авторы
-@DeDnI (Если хотите указать своё имя или ник)
