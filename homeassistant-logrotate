@@ -1,0 +1,13 @@
+/config/home-assistant.log {
+        daily
+        rotate 7
+        compress
+        delaycompress
+        missingok
+        notifempty
+        sharedscripts
+        postrotate
+                # Перезагрузите fail2ban для обновления логов
+                pkill -HUP -f "fail2ban-server" || true
+        endscript
+}

@@ -1,0 +1,26 @@
+[DEFAULT]
+# Используем iptables для блокировки
+banaction = iptables-multiport
+#banaction_allports = iptables-allports
+action = iptables-multiport[name=HA, port=8123, protocol=tcp]
+
+# Журналируем чтобы видеть срабатывания
+logtarget = STDOUT
+
+# Путь к папке где лежат фильтры (по умолчанию /etc/fail2ban/filter.d)
+filter.d = /etc/fail2ban/filter.d
+
+[homeassistant]
+enabled = true
+filter = homeassistant
+logpath = /config/home-assistant.log
+maxretry = 5
+bantime = 600
+findtime = 300
+port = 8123
+
+[sshd]
+enabled = false
+
+[sshd-ddos]
+enabled = false

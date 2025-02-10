@@ -1,0 +1,34 @@
+name: "DDoS Protection"
+version: "2.7"
+slug: "ddos_protection"
+description: "Protect Home Assistant from DDoS and BruteForce"
+
+arch:
+  - aarch64
+  - amd64
+  - armv7
+
+startup: services
+boot: auto
+host_network: true
+
+privileged:
+  - NET_ADMIN
+  - NET_RAW
+
+webui: "http://[HOST]:[PORT:8080]"
+
+map:
+  config: rw
+  config: /config
+
+options:
+  ddos_threshold: 500
+  max_retry: 5
+  ban_time: 600
+
+
+schema:
+  ddos_threshold: "int"
+  max_retry: "int"
+  ban_time: "int"
