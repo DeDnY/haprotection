@@ -31,7 +31,7 @@ RUN tar czf /bundle.tar.gz \
 #####################################################
 # 2) final: Home Assistant Supervisor билдит только это
 #####################################################
-ARG BUILD_FROM="ghcr.io/<ВАШ_ЛОГИН>/ha-ddos-builder:latest"
+ARG BUILD_FROM="ghcr.io/DeDnY/ha-ddos-builder:latest"
 FROM ${BUILD_FROM}
 
 # Распаковываем зависимости, установленные на builder-этапе
