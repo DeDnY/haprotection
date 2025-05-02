@@ -3,6 +3,7 @@
 #####################################################
 # 1) builder: собираем все зависимости с выходом в сеть
 #####################################################
+ARG BUILD_FROM="ghcr.io/dedny/ha-ddos-builder:latest"
 FROM alpine:3.18 AS builder
 
 RUN apk update && apk upgrade && \
@@ -31,7 +32,6 @@ RUN tar czf /bundle.tar.gz \
 #####################################################
 # 2) final: Home Assistant Supervisor билдит только это
 #####################################################
-ARG BUILD_FROM="ghcr.io/dedny/ha-ddos-builder:latest"
 FROM ${BUILD_FROM}
 
 # Распаковываем зависимости, установленные на builder-этапе
