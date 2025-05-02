@@ -1,36 +1,50 @@
-FROM alpine:3.18
+# syntax=docker/dockerfile:1
 
-# Установка пакетов
-RUN     apk update && \
-        apk upgrade && \
-        apk add --no-cache \
-                bash \
-                nftables \
-                iproute2 \
-                python3 \
-                py3-pip \
-                curl \
-                jq \
-                ca-certificates \
-                logrotate \
-                fail2ban && \
-        update-ca-certificates && \
-        rm -f /etc/fail2ban/jail.d/sshd.conf \
-        /etc/fail2ban/jail.d/sshd-ddos.conf \
-        /etc/fail2ban/jail.d/alpine-sshd.conf \
-        /etc/fail2ban/jail.conf && \
-        pip install --no-cache-dir flask
-RUN     apk add --no-cache logrotate
-RUN     mkdir -p /etc/logrotate.d
+#####################################################
+# 1) builder: собираем все зависимости с выходом в сеть
+#####################################################
+FROM alpine:3.18 AS builder
 
-# Копируем скрипт в контейрнер
-COPY run.sh /run.sh
-COPY jail.local /etc/fail2ban/jail.local
-COPY homeassistant.conf /etc/fail2ban/filter.d/homeassistant.conf
-COPY homeassistant-logrotate /etc/logrotate.d/homeassistant
-COPY app.py /app.py
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+      bash \
+      nftables \
+      iproute2 \
+      python3 \
+      py3-pip \
+      curl \
+      jq \
+      ca-certificates \
+      logrotate \
+      fail2ban
+
+# Собираем всё, что понадобится, в единый архив
+RUN tar czf /bundle.tar.gz \
+      /etc/fail2ban \
+      /etc/logrotate.d \
+      /etc/ssl/certs \
+      /usr/bin \
+      /usr/lib \
+      /lib \
+      /sbin
+
+#####################################################
+# 2) final: Home Assistant Supervisor билдит только это
+#####################################################
+ARG BUILD_FROM="ghcr.io/<ВАШ_ЛОГИН>/ha-ddos-builder:latest"
+FROM ${BUILD_FROM}
+
+# Распаковываем зависимости, установленные на builder-этапе
+COPY --from=builder /bundle.tar.gz /bundle.tar.gz
+RUN tar xzf /bundle.tar.gz -C /
+
+# Копируем ваше приложение и конфиги
+COPY run.sh                   /run.sh
+COPY jail.local               /etc/fail2ban/jail.local
+COPY homeassistant.conf       /etc/fail2ban/filter.d/homeassistant.conf
+COPY homeassistant-logrotate  /etc/logrotate.d/homeassistant
+COPY app.py                   /app.py
 
 RUN chmod +x /run.sh
 
-# Указываем, какой файл запускать на старте контейнера
-CMD ["/run.sh"]
+CMD [ "/run.sh" ]
