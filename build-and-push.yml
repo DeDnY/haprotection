@@ -33,7 +33,7 @@ jobs:
 
       - name: 📤 Push builder image
         run: |
-          docker push ghcr.io/<ВАШ_ЛОГИН>/ha-ddos-builder:latest
+          docker push ghcr.io/DeDnY/ha-ddos-builder:latest
 
       - name: ✅ Test final add-on build
         run: |
