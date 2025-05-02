@@ -28,7 +28,7 @@ jobs:
         run: |
           docker build \
             --target builder \
-            -t ghcr.io/<ВАШ_ЛОГИН>/ha-ddos-builder:latest \
+            -t ghcr.io/DeDnY/ha-ddos-builder:latest \
             .
 
       - name: 📤 Push builder image
