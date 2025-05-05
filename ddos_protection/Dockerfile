@@ -38,8 +38,15 @@ RUN tar czf /bundle.tar.gz \
 FROM ${BUILD_FROM}
 
 # Распаковываем зависимости, установленные на builder-этапе
-COPY --from=builder /bundle.tar.gz /bundle.tar.gz
-RUN tar xzf /bundle.tar.gz -C /
+# Copy in only the bits we need from the builder
+COPY --from=builder /etc/fail2ban        /etc/fail2ban
+COPY --from=builder /etc/logrotate.d     /etc/logrotate.d
+COPY --from=builder /etc/ssl/certs       /etc/ssl/certs
+COPY --from=builder /usr/bin             /usr/bin
+COPY --from=builder /usr/sbin            /usr/sbin
+COPY --from=builder /lib                 /lib
+COPY --from=builder /usr/lib             /usr/lib
+COPY --from=builder /sbin                /sbin
 
 # Копируем ваше приложение и конфиги
 COPY run.sh                   /run.sh
