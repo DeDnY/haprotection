@@ -24,11 +24,12 @@ jobs:
 
       - name: 🏗️ Build builder stage
         run: |
-          docker build \
-            --target builder \
-            -t ghcr.io/dedny/ha-ddos-builder:latest \
-            .
-
+         docker build \
+           --target builder \
+           -t ghcr.io/dedny/ha-ddos-builder:latest \
+           -f ddos_protection/Dockerfile \
+           ddos_protection
+           
       - name: 📤 Push builder image
         run: |
           docker push ghcr.io/dedny/ha-ddos-builder:latest
@@ -38,4 +39,5 @@ jobs:
           docker build \
             --build-arg BUILD_FROM=ghcr.io/dedny/ha-ddos-builder:latest \
             -t local/ha-ddos-addon:latest \
-            .
+            -f ddos_protection/Dockerfile \
+            ddos_protection
