@@ -21,6 +21,13 @@ log_statistics() {
     fi
 }
 
+    echo "Установленные подключения к HA (порт 8123):"
+    ss -ntu \
+      | awk '$5 ~ /:8123$/ { print $5 }' \
+      | cut -d: -f1 \
+      | sort \
+      | uniq -c \
+      || echo "  (нет активных подключений)"
 
 echo "=== Запуск run.sh ==="
 
