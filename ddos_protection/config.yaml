@@ -29,9 +29,6 @@ options:
   ban_time: 600
 
 schema:
-  ddos_threshold:
-    type: int
-  max_retry:
-    type: int
-  ban_time:
-    type: int
+  ddos_threshold: "int"
+  max_retry: "int"
+  ban_time: "int"
