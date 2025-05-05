@@ -49,26 +49,46 @@ def sample_metrics():
 threading.Thread(target=sample_metrics, daemon=True).start()
 
 def get_active_ips():
-    """Parse the nftables meter ‘elements = { ip : count, … }’."""
-    rv = []
+    rv = {}
+
+    # 1) Новые соединения из meter (ddos_rate)
     try:
         out = subprocess.check_output(
             ["nft", "list", "meter", "inet", "ddos", "ddos_meter"],
             stderr=subprocess.DEVNULL
         ).decode()
-        # Grab the comma-separated list inside { … }
         m = re.search(r"elements\s*=\s*\{([^}]*)\}", out)
         if m:
-            blob = m.group(1)            # e.g. " 192.168.0.10 : 15, 192.168.0.20 : 7 "
-            for part in blob.split(","):
+            for part in m.group(1).split(","):
                 part = part.strip()
                 if not part:
                     continue
-                ip, count = part.split(":")
-                rv.append({"ip": ip.strip(), "packets": count.strip()})
-    except Exception:
+                ip, cnt = part.split(":")
+                rv[ip.strip()] = { "packets": int(cnt.strip()), "established": 0 }
+    except subprocess.CalledProcessError:
         pass
-    return rv
+
+    # 2) Установленные TCP-сессии к порту 8123
+    try:
+        # формат: State Recv-Q Send-Q Local Address:Port Peer Address:Port
+        out = subprocess.check_output(["ss", "-ntu"]).decode().splitlines()
+        for line in out:
+            cols = line.split()
+            # Peer = cols[4], Local = cols[3]
+            if cols[3].endswith(":8123"):
+                peer = cols[4].rsplit(":", 1)[0]
+                if peer not in rv:
+                    rv[peer] = { "packets": 0, "established": 1 }
+                else:
+                    rv[peer]["established"] += 1
+    except subprocess.CalledProcessError:
+        pass
+
+    # Преобразуем словарь в список для шаблона
+    return [
+        { "ip": ip, **data }
+        for ip, data in rv.items()
+    ]
 
 def get_blocked_ips():
     """List IPs currently in the blocked_ips set."""
