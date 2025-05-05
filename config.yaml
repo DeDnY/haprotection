@@ -22,14 +22,14 @@ map:
   config: /config
 
 options:
-  ddos_threshold: 100
+  ddos_threshold: 500
   max_retry: 5
   ban_time: 600
 
 schema:
   ddos_threshold:
-    type: integer
+    type: int
   max_retry:
-    type: integer
+    type: int
   ban_time:
-    type: integer
+    type: int
