@@ -1,5 +1,5 @@
 name: "DDoS Protection"
-version: "3.1"
+version: "3.2"
 slug: "ddos_protection"
 description: "Protect Home Assistant from DDoS and BruteForce"
 
@@ -28,8 +28,8 @@ options:
 
 schema:
   ddos_threshold:
-    type: int
+    type: "int"
   max_retry:
-    type: int
+    type: "int"
   ban_time:
-    type: int
+    type: "int"
