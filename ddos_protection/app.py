@@ -11,7 +11,7 @@ TEMPLATE = r"""
   <title>DDoS Protection</title>
 </head>
 <body>
-  <h1>Мини‐AdGuard для IP (nftables)</h1>
+  <h1>Мини‐Guard для IP (nftables)</h1>
 
   <h2>Клиенты (активные IP)</h2>
   <p>Отображаем IP, которые зафиксированы в meter ddos_meter:</p>
