@@ -26,6 +26,6 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ha-ddos-addon:latest
-            ghcr.io/${{ github.repository_owner }}/ha-ddos-addon:${{ github.sha }}
+           tags: |
+            ghcr.io/dedny/ha-ddos-addon:latest
+            ghcr.io/dedny/ha-ddos-addon:${{ github.sha }}
