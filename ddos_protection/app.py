@@ -55,8 +55,6 @@ threading.Thread(target=sample_metrics, daemon=True).start()
 
 def get_active_ips():
     rv = {}
-
-    # 1) Новые соединения из meter (ddos_rate)
     try:
         out = subprocess.check_output(
             ["nft", "list", "meter", "inet", "ddos", "ddos_meter"],
@@ -66,11 +64,14 @@ def get_active_ips():
         if m:
             for part in m.group(1).split(","):
                 part = part.strip()
-                if not part:
+                # Skip empty or malformed entries
+                if not part or ":" not in part:
                     continue
-                ip, cnt = part.split(":")
-                rv[ip.strip()] = { "packets": int(cnt.strip()), "established": 0 }
-    except subprocess.CalledProcessError:
+                ip_str, cnt_str = part.split(":", 1)
+                ip  = ip_str.strip()
+                cnt = cnt_str.strip()
+                rv[ip] = {"packets": int(cnt), "established": 0}
+    except Exception:
         pass
 
     # 2) Установленные TCP-сессии к порту 8123
