@@ -4,6 +4,7 @@ name: Build and Push DDOS-Base Builder
 on:
   push:
     branches: [ main ]
+    branches: [ main, ddos_protection, other-branch ]
 
 permissions:
   contents: read    # для checkout
