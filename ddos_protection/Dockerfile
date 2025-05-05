@@ -20,17 +20,17 @@ RUN apk update && apk upgrade && \
       fail2ban
 
 # Собираем всё, что понадобится, в единый архив
-RUN tar czf /bundle.tar.gz \
-      /etc/fail2ban \
-      /etc/logrotate.d \
-      /etc/ssl/certs \
-      /usr/bin \
-      /usr/bin \
-      /usr/sbin \
-      /usr/local/sbin \
-      /usr/lib \
-      /lib \
-      /sbin
+#RUN tar czf /bundle.tar.gz \
+#      /etc/fail2ban \
+#      /etc/logrotate.d \
+#      /etc/ssl/certs \
+#      /usr/bin \
+#      /usr/bin \
+#      /usr/sbin \
+#      /usr/local/sbin \
+#      /usr/lib \
+#      /lib \
+#      /sbin
 
 #####################################################
 # 2) final: Home Assistant Supervisor билдит только это
