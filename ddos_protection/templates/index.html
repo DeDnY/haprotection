@@ -17,20 +17,22 @@
   <h1>Мини-Guard для IP (nftables)</h1>
 
   <h2>Клиенты (активные IP)</h2>
-  <table>
-    <tr><th>IP</th><th>Packets</th><th>Действие</th></tr>
-    {% for c in active_ips %}
-    <tr>
-      <td>{{ c.ip }}</td>
-      <td>{{ c.packets }}</td>
-      <td>
-        <a class="btn btn-ban" href="{{ url_for('ban', ip=c.ip) }}">Забанить</a>
-      </td>
-    </tr>
-    {% else %}
-    <tr><td colspan="3">(нет активных IP)</td></tr>
-    {% endfor %}
-  </table>
+<table>
+  <tr><th>IP</th><th>Packets<br>(новые)</th><th>Established<br>(активные)</th><th>Действие</th></tr>
+  {% for c in active_ips %}
+  <tr>
+    <td>{{ c.ip }}</td>
+    <td>{{ c.packets }}</td>
+    <td>{{ c.established }}</td>
+    <td>
+      <a class="btn btn-ban" href="{{ url_for('ban', ip=c.ip) }}">Забанить</a>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4">(нет активных IP)</td></tr>
+  {% endfor %}
+</table>
+
 
   <h2>Заблокированные IP</h2>
   <table>
