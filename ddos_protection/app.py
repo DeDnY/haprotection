@@ -126,21 +126,28 @@ def get_blocked_ips():
             ["nft","list","set","inet","ddos","blocked_ips"],
             stderr=subprocess.DEVNULL
         ).decode()
-        # look for lines like: "element inet ddos blocked_ips { 1.2.3.4 timeout ... }"
-        for line in out.splitlines():
-            if "element inet ddos blocked_ips" in line:
-                tokens = line.replace("{","").replace("}","").split()
-                # tokens[-4] = IP (e.g. "1.2.3.4")
-                if len(tokens) >= 4:
-                    rv.append(tokens[-4])
-    except:
+        # найдем содержимое между { ... }
+        m = re.search(r"elements\s*=\s*\{([^}]*)\}", out)
+        if m:
+            for part in m.group(1).split(","):
+                txt = part.strip()
+                if not txt:
+                    continue
+                # первый токен — это IP
+                ip = txt.split()[0]
+                rv.append(ip)
+    except Exception:
         pass
     return rv
 
 @app.route("/")
 def index():
-    act = get_active_ips()
-    blk = get_blocked_ips()
+    # берём списки
+    active = get_active_ips()
+    blocked = set(get_blocked_ips())
+    # исключаем из активных те, что уже забанены
+    act = [c for c in active if c["ip"] not in blocked]
+    blk = sorted(blocked)
     return render_template("index.html", active_ips=act, blocked_ips=blk)
 
 @app.route("/ban/<ip>")
