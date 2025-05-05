@@ -137,18 +137,12 @@ def index():
 
 @app.route("/ban/<ip>")
 def ban(ip):
-    subprocess.call([
-        "nft","add","element","inet","ddos","blocked_ips",
-        "{", f"ip saddr {ip}", "timeout", "600s", "}"
-    ])
+    subprocess.call(["nft","add","element","inet","ddos","blocked_ips", "{", ip, f"timeout {BAN_TIME}s", "}"])
     return redirect(url_for("index"))
 
 @app.route("/unban/<ip>")
 def unban(ip):
-    subprocess.call([
-        "nft","delete","element","inet","ddos","blocked_ips",
-        "{", ip, "}"
-    ])
+    subprocess.call(["nft","delete","element","inet","ddos","blocked_ips", "{", ip, "}"])
     return redirect(url_for("index"))
 
 @app.route("/api/metrics")
