@@ -3,5 +3,5 @@
   "url": "https://github.com/DeDnY/haprotection",
   "slug": "ddos_protection",
   "description": "Protect Home Assistant from DDoS and brute-force",
-  "version": "3.0"
+  "version": "3.1"
 }
