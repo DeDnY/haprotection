@@ -10,6 +10,13 @@ from flask import Flask, render_template, redirect, url_for, jsonify
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
+# ─── Читаем опции один раз при старте ───
+with open("/data/options.json") as _f:
+    _opts = json.load(_f)
+DDOS_THRESHOLD = _opts.get("ddos_threshold", 600)
+MAX_RETRY      = _opts.get("max_retry", 5)
+BAN_TIME       = _opts.get("ban_time", 600)
+
 # ─── In-memory ring buffer for last 120 samples (~1h @ 30s) ───
 MAX_SAMPLES = 120
 timestamps = collections.deque(maxlen=MAX_SAMPLES)
