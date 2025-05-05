@@ -1,6 +1,9 @@
 name: 🏗️ Build & Push DDoS Protection Add-on
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -23,8 +26,8 @@ jobs:
       - name: Build and push add-on image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: Dockerfile
+          context: ./ddos_protection       # build context is the folder
+          file: ./ddos_protection/Dockerfile  # path to your Dockerfile
           push: true
           tags: |
             ghcr.io/dedny/ha-ddos-addon:latest
