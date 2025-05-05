@@ -13,8 +13,11 @@ arch:
 startup: application
 boot: auto
 host_network: true
-privileged: true
 
+privileged:
+  - NET_ADMIN
+  - NET_RAW
+  
 webui: "http://[HOST]:[PORT:8080]"
 
 map:
