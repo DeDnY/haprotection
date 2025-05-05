@@ -49,21 +49,24 @@ def sample_metrics():
 threading.Thread(target=sample_metrics, daemon=True).start()
 
 def get_active_ips():
-    """Parse nft meter for active IPs & packet counts."""
+    """Parse the nftables meter ‘elements = { ip : count, … }’."""
     rv = []
     try:
         out = subprocess.check_output(
-            ["nft","list","meter","inet","ddos","ddos_meter"],
+            ["nft", "list", "meter", "inet", "ddos", "ddos_meter"],
             stderr=subprocess.DEVNULL
         ).decode()
-        for line in out.splitlines():
-            parts = line.strip().split()
-            # expect: ip saddr 1.2.3.4 packets 123 ...
-            if len(parts) >= 5 and parts[0] != "meter" and "packets" in parts:
-                ip = parts[2]
-                pkt = parts[-1]
-                rv.append({"ip": ip, "packets": pkt})
-    except:
+        # Grab the comma-separated list inside { … }
+        m = re.search(r"elements\s*=\s*\{([^}]*)\}", out)
+        if m:
+            blob = m.group(1)            # e.g. " 192.168.0.10 : 15, 192.168.0.20 : 7 "
+            for part in blob.split(","):
+                part = part.strip()
+                if not part:
+                    continue
+                ip, count = part.split(":")
+                rv.append({"ip": ip.strip(), "packets": count.strip()})
+    except Exception:
         pass
     return rv
 
