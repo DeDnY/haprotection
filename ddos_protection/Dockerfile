@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 
-##########################################
-# 1) Сборка builder-этапа с выходом в сеть
-##########################################
-FROM alpine:3.18 AS builder
+####################################################
+# Финальный образ — сразу ставим всё необходимое
+####################################################
+FROM alpine:3.18
 
+# 1) Устанавливаем все зависимости (включая nft и fail2ban)
 RUN apk update && apk upgrade && \
     apk add --no-cache \
       bash \
@@ -18,20 +19,15 @@ RUN apk update && apk upgrade && \
       logrotate \
       fail2ban
 
-##########################################
-# 2) Финальный образ — просто наследуем builder
-##########################################
-FROM builder
-
-# Копируем ваш скрипт и конфиги
+# 2) Копируем скрипт и конфиги адд-она
 COPY run.sh                   /run.sh
 COPY jail.local               /etc/fail2ban/jail.local
 COPY homeassistant.conf       /etc/fail2ban/filter.d/homeassistant.conf
 COPY homeassistant-logrotate  /etc/logrotate.d/homeassistant
 COPY app.py                   /app.py
 
-# Скрипту нужен execute-флаг
+# 3) Делаем run.sh исполняемым
 RUN chmod +x /run.sh
 
-# Запускаем ваш run.sh как PID 1
+# 4) Запускаем run.sh как PID 1
 CMD [ "/run.sh" ]
