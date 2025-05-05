@@ -61,7 +61,7 @@ fail2ban-server -f --logtarget=STDOUT &
 # -----------------------------------------------------------------------------
 echo "Настраиваем nftables защиту (таблица ddos)..."
 # Удаляем только свою таблицу (если есть), не трогаем остальное
-if ! nft list table inet ddos >/dev/null 2>&1; then
+nft delete table inet ddos 2>/dev/null || true
 
 # Создаём таблицу и структуры
 nft add table inet ddos
@@ -79,7 +79,6 @@ nft add rule inet ddos output tcp sport 53 accept
 # Ограничиваем правила только внешним интерфейсом eno1
 # Пропускаем трафик от роутера и от самой машины (например, IP 192.168.0.1 и 192.168.0.57)
 nft add rule inet ddos input iif "eno1" ip saddr { 192.168.0.1,192.168.0.57 } accept
-fi
 
 # Блокируем уже забаненные IP
 nft add rule inet ddos input iif "eno1" ip saddr @blocked_ips drop
