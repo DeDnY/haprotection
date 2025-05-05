@@ -1,0 +1,7 @@
+{
+  "name": "DDoS Protection",
+  "url": "https://github.com/DeDnY/haprotection",
+  "slug": "ddos_protection",
+  "description": "Protect Home Assistant from DDoS and brute-force",
+  "version": "3.0"
+}
