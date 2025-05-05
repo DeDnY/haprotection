@@ -36,10 +36,6 @@ RUN tar czf /bundle.tar.gz \
 #####################################################
 FROM ${BUILD_FROM}
 
-# Распаковываем зависимости, установленные на builder-этапе
-COPY --from=builder /bundle.tar.gz /bundle.tar.gz
-RUN tar xzf /bundle.tar.gz -C /
-
 # Копируем ваше приложение и конфиги
 COPY run.sh                   /run.sh
 COPY jail.local               /etc/fail2ban/jail.local
