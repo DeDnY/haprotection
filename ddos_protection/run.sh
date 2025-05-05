@@ -79,6 +79,7 @@ nft add rule inet ddos output tcp sport 53 accept
 # Ограничиваем правила только внешним интерфейсом eno1
 # Пропускаем трафик от роутера и от самой машины (например, IP 192.168.0.1 и 192.168.0.57)
 nft add rule inet ddos input iif "eno1" ip saddr { 192.168.0.1,192.168.0.57 } accept
+fi
 
 # Блокируем уже забаненные IP
 nft add rule inet ddos input iif "eno1" ip saddr @blocked_ips drop
