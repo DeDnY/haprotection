@@ -27,6 +27,7 @@ RUN tar czf /bundle.tar.gz \
       /usr/bin \
       /usr/bin \
       /usr/sbin \
+      /usr/local/sbin \
       /usr/lib \
       /lib \
       /sbin
@@ -35,6 +36,10 @@ RUN tar czf /bundle.tar.gz \
 # 2) final: Home Assistant Supervisor билдит только это
 #####################################################
 FROM ${BUILD_FROM}
+
+# Распаковываем зависимости, установленные на builder-этапе
+COPY --from=builder /bundle.tar.gz /bundle.tar.gz
+RUN tar xzf /bundle.tar.gz -C /
 
 # Копируем ваше приложение и конфиги
 COPY run.sh                   /run.sh
