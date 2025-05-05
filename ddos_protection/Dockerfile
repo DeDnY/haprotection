@@ -25,6 +25,8 @@ RUN tar czf /bundle.tar.gz \
       /etc/logrotate.d \
       /etc/ssl/certs \
       /usr/bin \
+      /usr/bin \
+      /usr/sbin \
       /usr/lib \
       /lib \
       /sbin
