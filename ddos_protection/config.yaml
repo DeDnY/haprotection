@@ -22,8 +22,8 @@ map:
   config: /config
 
 options:
-  ddos_threshold: 500
-  max_retry: 5
+  ddos_threshold: 600
+  max_retry: 10
   ban_time: 600
 
 schema:
