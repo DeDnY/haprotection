@@ -28,8 +28,8 @@ options:
 
 schema:
   ddos_threshold:
-    type: 'int(1,10000)'
+    type: int
   max_retry:
-    type: 'int(1,20)'
+    type: int
   ban_time:
-    type: 'int(60,86400)'
+    type: int
