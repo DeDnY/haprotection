@@ -1,5 +1,5 @@
 name: "DDoS Protection"
-version: "3.2"
+version: "3.3"
 slug: "ddos_protection"
 description: "Protect Home Assistant from DDoS and BruteForce"
 
@@ -8,7 +8,7 @@ arch:
   - amd64
   - armv7
 
-startup: services
+startup: application
 boot: auto
 host_network: true
 
@@ -22,7 +22,7 @@ map:
   config: /config
 
 options:
-  ddos_threshold: 601
+  ddos_threshold: 600
   max_retry: 10
   ban_time: 600
 
