@@ -1,5 +1,5 @@
 name: "DDoS Protection"
-version: "3.0"
+version: "3.1"
 slug: "ddos_protection"
 description: "Protect Home Assistant from DDoS and BruteForce"
 
