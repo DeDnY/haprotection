@@ -1,43 +1,31 @@
-name: Build and Push DDOS-Base Builder
+name: 🏗️ Build & Push DDoS Protection Add-on
 
-# Запускаем на каждый пуш в main
 on: push
-
-permissions:
-  contents: read    # для checkout
-  packages: write   # для пуша образов в GHCR
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 👷 Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: 🔐 Login to GitHub Container Registry
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🏗️ Build builder stage
-        run: |
-         docker build \
-           --target builder \
-           -t ghcr.io/dedny/ha-ddos-builder:latest \
-           -f ddos_protection/Dockerfile \
-           ddos_protection
-           
-      - name: 📤 Push builder image
-        run: |
-          docker push ghcr.io/dedny/ha-ddos-builder:latest
-
-      - name: ✅ Test final add-on build
-        run: |
-          docker build \
-            --build-arg BUILD_FROM=ghcr.io/dedny/ha-ddos-builder:latest \
-            -t local/ha-ddos-addon:latest \
-            -f ddos_protection/Dockerfile \
-            ddos_protection
+      - name: Build and push add-on image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ha-ddos-addon:latest
+            ghcr.io/${{ github.repository_owner }}/ha-ddos-addon:${{ github.sha }}
