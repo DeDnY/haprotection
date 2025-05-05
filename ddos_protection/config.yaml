@@ -1,7 +1,7 @@
 init: false
 
 name: "DDoS Protection"
-version: "4.6"
+version: "4.7"
 slug: "ddos_protection"
 description: "Protect Home Assistant from DDoS and BruteForce"
 
