@@ -1,5 +1,5 @@
 name: "DDoS Protection"
-version: "2.7"
+version: "3.0"
 slug: "ddos_protection"
 description: "Protect Home Assistant from DDoS and BruteForce"
 
@@ -19,16 +19,17 @@ privileged:
 webui: "http://[HOST]:[PORT:8080]"
 
 map:
-  config: rw
   config: /config
 
 options:
-  ddos_threshold: 500
+  ddos_threshold: 100
   max_retry: 5
   ban_time: 600
 
-
 schema:
-  ddos_threshold: "int"
-  max_retry: "int"
-  ban_time: "int"
+  ddos_threshold:
+    type: integer
+  max_retry:
+    type: integer
+  ban_time:
+    type: integer
