@@ -6,32 +6,21 @@ set -e
 # -----------------------------------------------------------------------------
 log_statistics() {
     echo "---- [$(date '+%Y-%m-%d %H:%M:%S')] Статистика ----"
-
-    # Попытки входа
-    if [ -f "/config/home-assistant.log" ]; then
-        LOG_ATTEMPTS=$(grep -c "Login attempt" /config/home-assistant.log)
-        echo "Всего попыток входа: $LOG_ATTEMPTS"
+    echo "Активные счётчики:"
+    if nft list meter inet ddos ddos_meter >/dev/null 2>&1; then
+        nft list meter inet ddos ddos_meter | grep -E "ip saddr|packets"
     else
-        echo "Лог Home Assistant не найден."
+        echo "  (счетчик ddos_meter не найден)"
     fi
 
-    # NFT-meter
-    echo "Активные счётчики:"
-    nft list meter inet ddos ddos_meter 2>/dev/null | grep -E "ip saddr|packets" | column -t
-
-    # Топ IP по подключению
-    ss -ntu | tail -n +2 | awk '{print $5}' | cut -d: -f1 | sort | uniq -C
-
-    # Забаненные IP
     echo "Забаненные IP:"
-    nft list set inet ddos blocked_ips 2>/dev/null || echo "(пусто)"
+    if nft list set inet ddos blocked_ips >/dev/null 2>&1; then
+        nft list set inet ddos blocked_ips
+    else
+        echo "  (нет заблокированных IP)"
+    fi
 }
 
-# Аргумент --stats
-if [[ "$1" == "--stats" ]]; then
-    log_statistics
-    exit 0
-fi
 
 echo "=== Запуск run.sh ==="
 
