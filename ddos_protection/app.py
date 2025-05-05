@@ -55,44 +55,52 @@ threading.Thread(target=sample_metrics, daemon=True).start()
 
 def get_active_ips():
     rv = {}
+
+    # 1) “New” connections from nft meter
     try:
         out = subprocess.check_output(
-            ["nft", "list", "meter", "inet", "ddos", "ddos_meter"],
+            ["nft","list","meter","inet","ddos","ddos_meter"],
             stderr=subprocess.DEVNULL
         ).decode()
         m = re.search(r"elements\s*=\s*\{([^}]*)\}", out)
         if m:
             for part in m.group(1).split(","):
                 part = part.strip()
-                # Skip empty or malformed entries
                 if not part or ":" not in part:
                     continue
                 ip_str, cnt_str = part.split(":", 1)
                 ip  = ip_str.strip()
-                cnt = cnt_str.strip()
-                rv[ip] = {"packets": int(cnt), "established": 0}
+                cnt = int(cnt_str.strip())
+                rv[ip] = { "packets": cnt, "established": 0 }
     except Exception:
         pass
 
-    # 2) Установленные TCP-сессии к порту 8123
+    # 2) “Established” TCP sessions to port 8123
     try:
-        # формат: State Recv-Q Send-Q Local Address:Port Peer Address:Port
-        out = subprocess.check_output(["ss", "-ntu"]).decode().splitlines()
-        for line in out:
+        # -H hides header, -n numeric, -t tcp, state established
+        ss_out = subprocess.check_output(
+            ["ss","-H","-tn","state","established"]
+        ).decode().splitlines()
+
+        for line in ss_out:
             cols = line.split()
-            # Peer = cols[4], Local = cols[3]
-            if cols[3].endswith(":8123"):
-                peer = cols[4].rsplit(":", 1)[0]
-                if peer not in rv:
-                    rv[peer] = { "packets": 0, "established": 1 }
+            # Local address:port is cols[3], Peer address:port is cols[4]
+            local, peer = cols[3], cols[4]
+            # If this socket is to port 8123 (on either side)
+            if local.endswith(":8123") or peer.endswith(":8123"):
+                # remote IP is whichever side is NOT :8123
+                remote = peer if local.endswith(":8123") else local
+                ip = remote.rsplit(":",1)[0]
+                if ip in rv:
+                    rv[ip]["established"] += 1
                 else:
-                    rv[peer]["established"] += 1
-    except subprocess.CalledProcessError:
+                    rv[ip] = { "packets": 0, "established": 1 }
+    except Exception:
         pass
 
-    # Преобразуем словарь в список для шаблона
+    # Convert to list for templating
     return [
-        { "ip": ip, **data }
+        { "ip": ip, "packets": data["packets"], "established": data["established"] }
         for ip, data in rv.items()
     ]
 
