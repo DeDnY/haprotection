@@ -1,8 +1,7 @@
 [DEFAULT]
 # Используем iptables для блокировки
-banaction = iptables-multiport
-#banaction_allports = iptables-allports
-action = iptables-multiport[name=HA, port=8123, protocol=tcp]
+banaction = nftables
+action = nftables-multiport[name=HA, port=8123, protocol=tcp]
 
 # Журналируем чтобы видеть срабатывания
 logtarget = STDOUT
