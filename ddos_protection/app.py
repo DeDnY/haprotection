@@ -7,7 +7,7 @@ import datetime
 import collections
 from flask import Flask, render_template, redirect, url_for, jsonify
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 
 # ─── In-memory ring buffer for last 120 samples (~1h @ 30s) ───
 MAX_SAMPLES = 120
