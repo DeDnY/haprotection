@@ -86,7 +86,7 @@ nft add rule inet ddos input iif "eno1" ct state new \
 
 # При превышении — добавляем IP в set blocked_ips на $BAN_TIME секунд и дропаем
 nft add rule inet ddos input iif "eno1" ct state new \
-    add @blocked_ips { ip saddr timeout ${BAN_TIME}s } drop
+    add @blocked_ips { timeout ${BAN_TIME}s } drop
 
 # Разрешаем доступ к порту Home Assistant (8123) и веб-интерфейсу аддона (5000)
 nft add rule inet ddos input iif "eno1" tcp dport 8123 accept
