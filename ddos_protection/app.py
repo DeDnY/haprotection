@@ -91,7 +91,6 @@ def get_all_connections():
 
 #Возвращает словарь { 'ip': count_of_connections },
 #анализируя 'ss -ntu'.
-
         import subprocess
         output = subprocess.check_output(["ss", "-ntu"]).decode("utf-8", "ignore")
         lines = output.splitlines()[1:]
