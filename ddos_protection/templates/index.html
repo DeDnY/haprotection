@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Mini-Guard для IP (nftables)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    table { border-collapse: collapse; margin-bottom: 1em; }
+    th, td { border: 1px solid #ccc; padding: 0.2em 0.5em; }
+    th { background: #eee; }
+    .btn { padding: 0.2em 0.5em; text-decoration:none; border:1px solid #888; border-radius:3px; }
+    .btn-ban { background: #faa; color:#800; }
+    .btn-unban { background: #afa; color:#080; }
+  </style>
+</head>
+<body>
+  <h1>Мини-Guard для IP (nftables)</h1>
+
+  <h2>Клиенты (активные IP)</h2>
+  <table>
+    <tr><th>IP</th><th>Packets</th><th>Действие</th></tr>
+    {% for c in active_ips %}
+    <tr>
+      <td>{{ c.ip }}</td>
+      <td>{{ c.packets }}</td>
+      <td>
+        <a class="btn btn-ban" href="{{ url_for('ban', ip=c.ip) }}">Забанить</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3">(нет активных IP)</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Заблокированные IP</h2>
+  <table>
+    <tr><th>IP</th><th>Действие</th></tr>
+    {% for ip in blocked_ips %}
+    <tr>
+      <td>{{ ip }}</td>
+      <td>
+        <a class="btn btn-unban" href="{{ url_for('unban', ip=ip) }}">Разбанить</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="2">(нет заблокированных IP)</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>График соединений</h2>
+  <canvas id="chart" width="900" height="400"></canvas>
+
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    const cfg = {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'DDoS rate',
+            borderColor: 'red',
+            backgroundColor: 'rgba(255,0,0,0.1)',
+            parsing: { yAxisKey: 'ddos' },
+            data: []
+          },
+          {
+            label: 'Brute-force fails',
+            borderColor: 'blue',
+            backgroundColor: 'rgba(0,0,255,0.1)',
+            parsing: { yAxisKey: 'brute' },
+            data: []
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'minute', tooltipFormat: 'HH:mm' },
+            title: { display: true, text: 'Время (последний час)' }
+          },
+          y: {
+            type: 'logarithmic',
+            title: { display: true, text: 'Количество (лог. шкала)' },
+            min: 1,
+            ticks: {
+              callback: v => Number(v).toLocaleString()
+            }
+          }
+        },
+        plugins: {
+          legend: { position: 'top' }
+        }
+      }
+    };
+    const chart = new Chart(ctx, cfg);
+
+    async function update() {
+      const resp = await fetch('/api/metrics');
+      const js   = await resp.json();
+      cfg.data.labels           = js.timestamps;
+      cfg.data.datasets[0].data = js.ddos;
+      cfg.data.datasets[1].data = js.brute;
+      chart.update('none');
+    }
+
+    update();
+    setInterval(update, 30000);
+  </script>
+</body>
+</html>
