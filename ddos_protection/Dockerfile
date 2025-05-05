@@ -1,9 +1,8 @@
 # syntax=docker/dockerfile:1
 
-#####################################################
-# 1) builder: собираем все зависимости с выходом в сеть
-#####################################################
-ARG BUILD_FROM="ghcr.io/dedny/ha-ddos-builder:latest"
+##########################################
+# 1) Сборка builder-этапа с выходом в сеть
+##########################################
 FROM alpine:3.18 AS builder
 
 RUN apk update && apk upgrade && \
@@ -19,35 +18,20 @@ RUN apk update && apk upgrade && \
       logrotate \
       fail2ban
 
-# Собираем всё, что понадобится, в единый архив
-#RUN tar czf /bundle.tar.gz \
-#      /etc/fail2ban \
-#      /etc/logrotate.d \
-#      /etc/ssl/certs \
-#      /usr/bin \
-#      /usr/bin \
-#      /usr/sbin \
-#      /usr/local/sbin \
-#      /usr/lib \
-#      /lib \
-#      /sbin
+##########################################
+# 2) Финальный образ — просто наследуем builder
+##########################################
+FROM builder
 
-#####################################################
-# 2) final: Home Assistant Supervisor билдит только это
-#####################################################
-FROM ${BUILD_FROM}
-
-# Распаковываем зависимости, установленные на builder-этапе
-# Копируем всё из builder-образа (он уже содержит APK-пакеты)
-# — no tarball dance needed, просто наследуем filesystem.
-
-# Копируем ваше приложение и конфиги
+# Копируем ваш скрипт и конфиги
 COPY run.sh                   /run.sh
 COPY jail.local               /etc/fail2ban/jail.local
 COPY homeassistant.conf       /etc/fail2ban/filter.d/homeassistant.conf
 COPY homeassistant-logrotate  /etc/logrotate.d/homeassistant
 COPY app.py                   /app.py
 
+# Скрипту нужен execute-флаг
 RUN chmod +x /run.sh
 
+# Запускаем ваш run.sh как PID 1
 CMD [ "/run.sh" ]
