@@ -61,13 +61,13 @@ fail2ban-server -f --logtarget=STDOUT &
 # -----------------------------------------------------------------------------
 echo "Настраиваем nftables защиту (таблица ddos)..."
 # Удаляем только свою таблицу (если есть), не трогаем остальное
-nft delete table inet ddos 2>/dev/null || true
+if ! nft list table inet ddos >/dev/null 2>&1; then
 
 # Создаём таблицу и структуры
 nft add table inet ddos
-nft add set inet ddos blocked_ips "{ type ipv4_addr\; flags timeout\; }"
-nft add chain inet ddos input "{ type filter hook input priority 0\; policy accept\; }"
-nft add chain inet ddos output "{ type filter hook output priority 0\; policy accept\; }"
+nft add set inet ddos blocked_ips '{ type ipv4_addr; flags timeout; }'
+nft add chain inet ddos input '{ type filter hook input priority 0; policy accept; }'
+nft add chain inet ddos output '{ type filter hook output priority 0; policy accept; }'
 
 # Разрешаем loopback и DNS (порт 53) на любом интерфейсе
 nft add rule inet ddos input iif "lo" accept
