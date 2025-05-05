@@ -1,3 +1,5 @@
+init: false
+
 name: "DDoS Protection"
 version: "3.3"
 slug: "ddos_protection"
