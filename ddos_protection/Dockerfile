@@ -16,7 +16,9 @@ RUN apk update && apk upgrade && \
       jq \
       ca-certificates \
       logrotate \
-      fail2ban
+      fail2ban && \
+    pip3 install flask
+
 
 # 2) Копируем скрипт и конфиги адд-она
 COPY run.sh                   /run.sh
