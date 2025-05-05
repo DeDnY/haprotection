@@ -65,13 +65,19 @@ def get_active_ips():
         m = re.search(r"elements\s*=\s*\{([^}]*)\}", out)
         if m:
             for part in m.group(1).split(","):
-                part = part.strip()
-                if not part or ":" not in part:
+                txt = part.strip()
+                if not txt:
                     continue
-                ip_str, cnt_str = part.split(":", 1)
-                ip  = ip_str.strip()
-                cnt = int(cnt_str.strip())
-                rv[ip] = { "packets": cnt, "established": 0 }
+                # если есть двоеточие – там count, иначе это просто dynamic entry
+                if ":" in txt:
+                    ip_str, cnt_str = txt.split(":", 1)
+                    ip  = ip_str.strip()
+                    cnt = int(cnt_str.strip())
+                else:
+                    # строка вида "192.168.0.20 limit rate 600/minute"
+                    ip  = txt.split()[0]
+                    cnt = 0
+                rv[ip] = {"packets": cnt, "established": 0}
     except Exception:
         pass
 
