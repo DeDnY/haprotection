@@ -26,6 +26,7 @@ COPY jail.local               /etc/fail2ban/jail.local
 COPY homeassistant.conf       /etc/fail2ban/filter.d/homeassistant.conf
 COPY homeassistant-logrotate  /etc/logrotate.d/homeassistant
 COPY app.py                   /app.py
+COPY templates                /templates
 
 # 3) Делаем run.sh исполняемым
 RUN chmod +x /run.sh
